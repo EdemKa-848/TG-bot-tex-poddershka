@@ -6,8 +6,6 @@ from config import *
 TOKEN = (TOKEN)
 bot = telebot.TeleBot(TOKEN)
 
-
-
 QA = {
     "Как оформить заказ?": "Для оформления заказа, пожалуйста, выберите интересующий вас товар и нажмите кнопку 'Добавить в корзину', затем перейдите в корзину и следуйте инструкциям для завершения покупки.",
     "Как узнать статус моего заказа?": "Вы можете узнать статус вашего заказа, войдя в свой аккаунт на нашем сайте и перейдя в раздел 'Мои заказы'. Там будет указан текущий статус вашего заказа.",
@@ -22,7 +20,14 @@ QA = {
 def start_handler(message):
     markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add('Проблемы с товаром', 'Технические проблемы', 'Часто задаваемые вопросы')
-    bot.send_message(message.chat.id, "Привет! Выберите область проблемы:", reply_markup=markup)
+    bot.send_message(message.chat.id, "Привет, мы интернет-магазин 'Продаем все на свете'! Это бот для тех.поддержки. Введите /info для ознакомления с ботом. Выберите вашу область проблемы:", reply_markup=markup)
+
+
+@bot.message_handler(commands=['info'])
+def start_handler(message):
+    markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add('Проблемы с товаром', 'Технические проблемы', 'Часто задаваемые вопросы')
+    bot.send_message(message.chat.id, "Это бот для тех.поддержки, который отвечает на часто задаваемые вопросы пользователей, предоставляет решения проблем и направляет запросы к специалистам при необходимости. У нас есть 2 отдела - программисты, которые могут починить что-то, если сломался сайт или оплата, и отдел продаж, который разбирается со всеми проблемами с товарами. Выберите вашу область проблемы:", reply_markup=markup)
 
 
 @bot.message_handler(func=lambda message: True)
@@ -45,11 +50,8 @@ def handle_message(message):
         bot.send_message(message.chat.id, faq_message, parse_mode='Markdown')
     else:
         bot.reply_to(message, "Извините, я не понимаю.")
-
-    
-    
-        
         bot.send_message(message.chat.id, faq_message, parse_mode='Markdown')
+
 
 def process_request(message, department):
     user_id = message.from_user.id
@@ -58,8 +60,5 @@ def process_request(message, department):
     add_request(user_id, username, text, department)
     bot.send_message(message.chat.id, f"Ваш запрос передан специалистам отдела {department}. Скоро с вами свяжутся.")
 
-# Инициализация БД при запуске
-setup_database()
 
-# Запуск бота
 bot.polling(none_stop=True)
